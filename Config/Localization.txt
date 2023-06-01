@@ -1,0 +1,14 @@
+Key,File,Type,UsedInMainMenu,NoTranslate,english
+buffElementOverheatedName,buffs,Buff,,,Overheated
+buffElementOverheatedDesc,buffs,Buff,,,"You're overheating. Rest, find water or shelter. When hot you will dehydrate faster."
+buffElementOverheatedTooltip,buffs,Buff,,,"You're overheating. Rest, find water or shelter."
+buffElementSwelteringDesc,buffs,Buff,,,"You are sweltering. You must rest, find water or shelter or you will die. When you're sweltering you will dehydrate faster."
+buffElementSwelteringDesc,buffs,Buff,,,"You are sweltering. You must rest, find water or shelter or you will die."
+buffElementFreezingDesc,buffs,Buff,,,"You are freezing. Find clothing, take shelter, equip a torch or build a campfire or you will die soon. When you're freezing you will burn more calories."
+buffElementFreezingTooltip,buffs,Buff,,,"You are Freezing. Find clothing, take shelter, equip a torch or build a campfire or you will die soon."
+buffElementHypothermiaName,buffs,Buff,,,Hypothermia
+buffElementHypothermiaDesc,buffs,Buff,,,"You're experiencing Hypothermia. Find clothing, shelter, equip a torch or build a campfire or die. With hypothermia you will burn more calories."
+buffElementHypothermiaTooltip,buffs,Buff,,,"You're experiencing Hypothermia. Find clothing, shelter, equip a torch or build a campfire or die."
+perkWellInsulatedRank1LongDesc,progression,perk For,,,"You like mild weather, but can handle a bit of temperature fluctuation. Gain 5 insulation against heat and cold, and lose 20% less food, water, stamina and health when effected by hot or cold temperatures."
+perkWellInsulatedRank2LongDesc,progression,perk For,,,"You are resistant to some pretty intense weather and lose 40% less food, water, stamina and health when effected by hot or cold temperatures. Grants 10 insulation against both heat and cold."
+perkWellInsulatedRank3LongDesc,progression,perk For,,,"You can now handle severe weather and typically could care less what the weather conditions are. You lose 60% less food, water, stamina and health when effected by hot or cold temperatures. Weather effects now won't impact your mobility too much."

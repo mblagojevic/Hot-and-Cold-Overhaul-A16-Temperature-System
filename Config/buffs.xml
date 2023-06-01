@@ -1,0 +1,298 @@
+<configs>
+	
+	<!-- Setting new temperatures for triggering Hot and Sweltering debuffs -->
+	<set xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementHot']/requirement[@name='CVarCompare' and @operation='GT']/@value">25</set>
+	<set xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementHot']/requirement[@name='CVarCompare' and @operation='LT']/@value">40</set>
+	
+	<set xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementSweltering']/requirement[@name='CVarCompare']/@value">40</set>
+	
+	<!-- Removing Well Insulated perk from Sweltering effect *Can be commented to make Well Insulated Level 3 perk make you never get Sweltering* -->
+	<remove xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementSweltering']/requirement[@name='ProgressionLevel']"/>
+	
+	<!-- Adding new debuff with name Overheated that happens at core temperatures between 60°F and 80°F -->
+	<insertBefore xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementHot']">
+		<triggered_effect trigger="onSelfBuffUpdate" action="AddOrRemoveBuff" buff="buffElementOverheated">
+			<requirement name="!HasBuff" buff="god"/>
+			<requirement name="CVarCompare" cvar="_coretemp" operation="GT" value="10"/>
+			<requirement name="CVarCompare" cvar="_coretemp" operation="LTE" value="25"/>
+		</triggered_effect>
+	</insertBefore>
+	
+	
+	<!-- Setting new temperatures for triggering Cold debuff -->
+	<set xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementCold']/requirement[@name='CVarCompare' and @operation='LT']/@value">-10</set>
+	<set xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementCold']/requirement[@name='CVarCompare' and @operation='GT']/@value">-20</set>
+	
+	<!-- We have to remove the current Freezing trigger temperatures as well as Well Insulated perk before we can append new values -->
+	<remove xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementFreezing']/requirement[@name='CVarCompare' and @cvar='_coretemp']"/>
+	<remove xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementFreezing']/requirement[@name='ProgressionLevel']"/>
+	
+	<append xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementFreezing']">
+		<requirement name="CVarCompare" cvar="_coretemp" operation="LTE" value="-20"/>
+		<requirement name="CVarCompare" cvar="_coretemp" operation="GT" value="-35"/>
+	</append>
+	
+	<!-- Adding new debuff with name Hypothermia that triggers at very low core temperature -->
+	<insertAfter xpath="/buffs/buff[@name='buffStatusCheck01']/effect_group/triggered_effect[@trigger='onSelfBuffUpdate' and @buff='buffElementFreezing']">
+		<triggered_effect trigger="onSelfBuffUpdate" action="AddOrRemoveBuff" buff="buffElementHypothermia">
+			<requirement name="!HasBuff" buff="god"/>
+			<requirement name="CVarCompare" cvar="_coretemp" operation="LTE" value="-35"/>
+			<!-- <requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="LT" value="3"/> --> <!-- Can be uncommented to make Well Insulated Level 3 perk make you never get Hypothermia  -->
+		</triggered_effect>
+	</insertAfter>
+	
+	
+	<!-- Wetness buff - from Misery Buisness by Gako21 -->
+	<set xpath="/buffs/buff[@name='buffElementWet']/effect_group/triggered_effect[@cvar='$WetTempModifier'][@operation='multiply']/@value">25</set>
+	<set xpath="/buffs/buff[@name='buffElementWet']/effect_group/triggered_effect[@cvar='$WetTempModifierDisplay'][@operation='multiply']/@value">4</set>
+	
+	
+	<!--New Overheated effects - Lowers Water by 1 every 10s -->
+	<insertBefore xpath="buffs/buff[@name='buffElementHot']">
+		<buff name="buffElementOverheated" name_key="buffElementOverheatedName" description_key="buffElementOverheatedDesc" tooltip_key="buffElementOverheatedTooltip" icon="ui_game_symbol_hot" icon_color="254,240,1">
+			<damage_type value="heat"/>
+			<stack_type value="ignore"/>
+			<effect_group>
+				<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementOverheated"/>
+	
+				<passive_effect name="WaterChangeOT" operation="base_subtract" value=".1"/>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".015">
+					<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1"/>
+				</passive_effect>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".04">
+					<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2"/>
+				</passive_effect>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".06">
+					<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3"/>
+				</passive_effect>
+	
+				<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Hot"/>
+				<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Hot"/>
+				<triggered_effect trigger="onSelfBuffStart" action="AddJournalEntry" journal="hotWeatherTip"/>
+			</effect_group>
+		</buff>
+	</insertBefore>	
+	
+	<!-- New Hot debuff effects - Lowers Water by 1 every 7s and lowers speed/jump by 30% and lowers stamina by 1 every 1s -->
+	<remove xpath="/buffs/buff[@name='buffElementHot']/effect_group"/>
+	<append xpath="/buffs/buff[@name='buffElementHot']">
+		<effect_group>
+			<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementHot"/>
+			
+			<passive_effect name="Mobility" operation="perc_add" value="-.3"/>
+			<passive_effect name="WalkSpeed" operation="perc_add" value="-.3"/>
+			<passive_effect name="RunSpeed" operation="perc_add" value="-.3"/>
+			<passive_effect name="JumpStrength" operation="perc_add" value="-.3"/>
+			<passive_effect name="WaterChangeOT" operation="base_subtract" value=".15"/>
+			<passive_effect name="StaminaChangeOT" operation="base_subtract" value="11"/>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Hot2"/>
+			<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Hot2"/>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1"/>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".03"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="2.2"/>
+		</effect_group>
+			
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2"/>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".06"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="4.4"/>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3"/>
+				<passive_effect name="Mobility" operation="perc_add" value=".3"/>
+				<passive_effect name="WalkSpeed" operation="perc_add" value=".3"/>
+				<passive_effect name="RunSpeed" operation="perc_add" value=".3"/>
+				<passive_effect name="JumpStrength" operation="perc_add" value=".3"/>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".09"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="6.6"/>
+		</effect_group>
+	</append>
+	
+	<!-- New Sweltering debuff effects - Lowers Water by 1 every 5s and lowers speed/jump by 50%, lowers stamina by 3 every 1s and lowers health by 1 every 4s -->
+	<remove xpath="/buffs/buff[@name='buffElementSweltering']/effect_group"/>
+	<append xpath="/buffs/buff[@name='buffElementSweltering']">
+		<update_rate value="1"/>
+		<effect_group>
+			<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementSweltering"/>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffElementHot"/>
+			
+			<passive_effect name="Mobility" operation="perc_add" value="-.5"/>
+			<passive_effect name="WalkSpeed" operation="perc_add" value="-.5"/>
+			<passive_effect name="RunSpeed" operation="perc_add" value="-.5"/>
+			<passive_effect name="JumpStrength" operation="perc_add" value="-.5"/>
+			<passive_effect name="WaterChangeOT" operation="base_subtract" value=".2"/>
+			<passive_effect name="StaminaChangeOT" operation="base_subtract" value="13"/>
+			<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".25"/>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Hot2"/>
+			<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Hot2"/>
+			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="0.3" fade="1" effect_name="Blur"/>
+			<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="1" effect_name="Blur"/>
+		</effect_group>
+			
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1">
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".04"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="2.6"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".15"/>
+			</requirement>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2">
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".08"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="5.2"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".1"/>
+			</requirement>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3">
+				<passive_effect name="Mobility" operation="perc_add" value=".2"/>
+				<passive_effect name="WalkSpeed" operation="perc_add" value=".2"/>
+				<passive_effect name="RunSpeed" operation="perc_add" value=".2"/>
+				<passive_effect name="JumpStrength" operation="perc_add" value=".2"/>
+				<passive_effect name="WaterChangeOT" operation="base_add" value=".12"/>
+				<passive_effect name="StaminaChangeOT" operation="base_add" value="7.8"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".05"/>
+			</requirement>
+		</effect_group>
+	</append>
+	
+	
+	<!-- New Cold debuff effects - Lowers Food by 1 every 10s -->
+	<set xpath="/buffs/buff[@name='buffElementCold']/@icon_color">1,240,255</set>
+	<remove xpath="/buffs/buff[@name='buffElementCold']/effect_group"/>
+	<append xpath="/buffs/buff[@name='buffElementCold']">
+		<effect_group>
+			<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementCold"/>
+			
+			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".1"/>
+			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".085">
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1"/>
+			</passive_effect>
+			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".06">
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2"/>
+			</passive_effect>
+			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".04">
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3"/>
+			</passive_effect>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Cold"/>
+			<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Cold"/>
+			<triggered_effect trigger="onSelfBuffStart" action="AddJournalEntry" journal="coldWeatherTip"/>
+		</effect_group>
+	</append>
+	
+	<!-- New Freezing debuff effects - Lowers Food by 1 every 7s, lowers speed/jump by 30%, lowers stamina by 1 every 1s and lowers health by 1 every 7s -->
+	<set xpath="/buffs/buff[@name='buffElementFreezing']/@icon_color">0,128,255</set>
+	<remove xpath="/buffs/buff[@name='buffElementFreezing']/effect_group"/>
+	<append xpath="/buffs/buff[@name='buffElementFreezing']">
+		<update_rate value="1"/>
+		<effect_group>
+			<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementFreezing"/>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffElementCold"/>
+			
+			<passive_effect name="Mobility" operation="perc_add" value="-.3"/>
+			<passive_effect name="WalkSpeed" operation="perc_add" value="-.3"/>
+			<passive_effect name="RunSpeed" operation="perc_add" value="-.3"/>
+			<passive_effect name="JumpStrength" operation="perc_add" value="-.3"/>
+			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".15"/>
+			<passive_effect name="StaminaChangeOT" operation="base_subtract" value="11"/>
+			<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".15"/>
+			
+			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Cold2"/>
+			<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Cold2"/>
+		</effect_group>
+			
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1">
+				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".12"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="8.8"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".12"/>
+			</requirement>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2">
+				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".09"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="6.6"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".09"/>
+			</requirement>
+		</effect_group>
+		
+		<effect_group>
+			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3">
+				<passive_effect name="Mobility" operation="perc_add" value="-.0"/>
+				<passive_effect name="WalkSpeed" operation="perc_add" value="-.0"/>
+				<passive_effect name="RunSpeed" operation="perc_add" value="-.0"/>
+				<passive_effect name="JumpStrength" operation="perc_add" value="-.0"/>
+				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".06"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="4.4"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".06"/>
+			</requirement>
+		</effect_group>	
+	</append>
+	
+	<!-- New Hypothermia debuff effects - Lowers Food by 1 every 5s, lowers speed/jump by 50%, lowers stamina by 3 every 1s and lowers health by 1 every 4s -->
+	<insertBefore xpath="/buffs/buff[@name='buffElementWet']">
+		<buff name="buffElementHypothermia" name_key="buffElementHypothermiaName" description_key="buffElementHypothermiaDesc" tooltip_key="buffElementHypothermiaTooltip" icon="ui_game_symbol_cold" icon_color="67,36,241" icon_blink="true">
+			<damage_type value="cold"/>
+			<stack_type value="ignore"/>
+			<update_rate value="1"/>
+			<effect_group>
+				<passive_effect name="BuffBlink" operation="base_set" value="2" duration="0,3" tags="buffElementHypothermia"/>
+	
+				<triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffElementFreezing"/>
+	
+				<passive_effect name="Mobility" operation="perc_add" value="-.5"/>
+				<passive_effect name="WalkSpeed" operation="perc_add" value="-.5"/>
+				<passive_effect name="RunSpeed" operation="perc_add" value="-.5"/>
+				<passive_effect name="JumpStrength" operation="perc_add" value="-.5"/>
+				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".2"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="13"/>
+				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".25"/>
+				
+				<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Cold2"/>
+				<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="3" effect_name="Cold2"/>
+				<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="0.3" fade="1" effect_name="Blur"/>
+				<triggered_effect trigger="onSelfBuffRemove" action="ModifyScreenEffect" intensity="0" fade="1" effect_name="Blur"/>
+			</effect_group>
+				
+			<effect_group>
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1">
+					<passive_effect name="FoodChangeOT" operation="base_subtract" value=".16"/>
+					<passive_effect name="StaminaChangeOT" operation="base_subtract" value="10.4"/>
+					<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".2"/>
+				</requirement>
+			</effect_group>
+			
+			<effect_group>
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2">
+					<passive_effect name="FoodChangeOT" operation="base_subtract" value=".12"/>
+					<passive_effect name="StaminaChangeOT" operation="base_subtract" value="7.8"/>
+					<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".15"/>
+				</requirement>
+			</effect_group>
+			
+			<effect_group>
+				<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="3">
+					<passive_effect name="Mobility" operation="perc_add" value="-.3"/>
+					<passive_effect name="WalkSpeed" operation="perc_add" value="-.3"/>
+					<passive_effect name="RunSpeed" operation="perc_add" value="-.3"/>
+					<passive_effect name="JumpStrength" operation="perc_add" value="-.3"/>
+					<passive_effect name="FoodChangeOT" operation="base_subtract" value=".08"/>
+					<passive_effect name="StaminaChangeOT" operation="base_subtract" value="5.2"/>
+					<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".1"/>
+				</requirement>
+			</effect_group>
+		</buff>
+	</insertBefore>
+</configs>

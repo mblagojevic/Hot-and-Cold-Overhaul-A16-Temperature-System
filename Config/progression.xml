@@ -1,0 +1,6 @@
+<configs>
+
+	<set xpath="/perks/perk[@name='perkWellInsulated'/effect_group/passive_effect[@name='HypothermalResist']/@value]">5,10,10</set>
+	<set xpath="/perks/perk[@name='perkWellInsulated'/effect_group/passive_effect[@name='HyperthermalResist']/@value]">5,10,10</set>
+
+</configs>
