@@ -1,6 +1,11 @@
 <configs>
-
-	<set xpath="/perks/perk[@name='perkWellInsulated'/effect_group/passive_effect[@name='HypothermalResist']/@value]">5,10,10</set>
-	<set xpath="/perks/perk[@name='perkWellInsulated'/effect_group/passive_effect[@name='HyperthermalResist']/@value]">5,10,10</set>
+	
+	<remove xpath="/progression/perks/perk[@name='perkWellInsulated']/effect_group/passive_effect[@name='HypothermalResist']"/>
+	<remove xpath="/progression/perks/perk[@name='perkWellInsulated']/effect_group/passive_effect[@name='HyperthermalResist']"/>
+	
+	<append xpath="/progression/perks/perk[@name='perkWellInsulated']/effect_group">
+		<passive_effect name="HypothermalResist" operation="base_add" level="1,2,3" value="5,10,10"/>
+		<passive_effect name="HyperthermalResist" operation="base_add" level="1,2,3" value="5,10,10"/>
+	</append>
 
 </configs>
