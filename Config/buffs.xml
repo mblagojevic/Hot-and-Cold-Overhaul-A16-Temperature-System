@@ -205,7 +205,7 @@
 			<passive_effect name="RunSpeed" operation="perc_add" value="-.3"/>
 			<passive_effect name="JumpStrength" operation="perc_add" value="-.3"/>
 			<passive_effect name="FoodChangeOT" operation="base_subtract" value=".15"/>
-			<passive_effect name="StaminaChangeOT" operation="base_subtract" value="11"/>
+			<passive_effect name="StaminaChangeOT" operation="base_subtract" value="12"/>
 			<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".15"/>
 			
 			<triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="3" effect_name="Cold2"/>
@@ -215,7 +215,7 @@
 		<effect_group>
 			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="1">
 				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".12"/>
-				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="8.8"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="9.6"/>
 				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".12"/>
 			</requirement>
 		</effect_group>
@@ -223,7 +223,7 @@
 		<effect_group>
 			<requirement name="ProgressionLevel" progression_name="perkWellInsulated" operation="Equals" value="2">
 				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".09"/>
-				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="6.6"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="7.2"/>
 				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".09"/>
 			</requirement>
 		</effect_group>
@@ -235,7 +235,7 @@
 				<passive_effect name="RunSpeed" operation="perc_add" value="-.0"/>
 				<passive_effect name="JumpStrength" operation="perc_add" value="-.0"/>
 				<passive_effect name="FoodChangeOT" operation="base_subtract" value=".06"/>
-				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="4.4"/>
+				<passive_effect name="StaminaChangeOT" operation="base_subtract" value="4.8"/>
 				<triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="subtract" value=".06"/>
 			</requirement>
 		</effect_group>	
